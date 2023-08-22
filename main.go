@@ -1,9 +1,12 @@
 package main
 
-import "github.com/gin-gonic/gin"
+import (
+	"harbor-image-delete/route"
+)
 
 func main() {
 	// 初始化路由
-	r = gin.Default()
+	r := route.InitRouter()
+	r.Run(":8090")
 
 }
