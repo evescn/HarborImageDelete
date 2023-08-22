@@ -22,16 +22,14 @@ func Get(tmpUrl string) (body []byte, err error) {
 	data.Set("page_size", "100")
 
 	// 添加 Basic Authentication 头
-	fmt.Println(config.UserPassword)
 	auth := config.UserPassword
 	authHeader := "Basic " + base64.StdEncoding.EncodeToString([]byte(auth))
-	fmt.Println(authHeader)
 	data.Set("Authorization", authHeader)
 
 	// 拼接完整url
 	u, _ := url.ParseRequestURI(apiUrl)
 	u.RawQuery = data.Encode()
-	fmt.Println("请求完整路径为", u.String())
+	//fmt.Println("请求完整路径为", u.String())
 
 	// 发起请求
 	resp, err := http.Get(u.String())

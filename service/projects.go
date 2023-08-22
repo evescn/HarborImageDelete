@@ -15,6 +15,7 @@ func Projects(projectsUrl string) (p *[]model.Projects, err error) {
 	if err != nil {
 		return nil, err
 	}
+	//logger.Info(string(data))
 
 	// 解析 JSON 数据
 	projects := new([]model.Projects)

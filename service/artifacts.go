@@ -8,14 +8,14 @@ import (
 	"harbor-image-delete/model"
 )
 
-func Artifacts(repositoriesUrl string) (r *[][]model.Artifacts, err error) {
+func Artifacts(repositoriesUrl string) (a *[]model.Artifacts, err error) {
 	// 发起 HTTP 请求
 	data, err := Get(repositoriesUrl)
 
 	if err != nil {
 		return nil, err
 	}
-	//fmt.Println(string(data))
+	//logger.Info(string(data))
 
 	// 解析 JSON 数据
 	artifacts := new([]model.ArtifactsTmp)
@@ -24,14 +24,13 @@ func Artifacts(repositoriesUrl string) (r *[][]model.Artifacts, err error) {
 		return nil, errors.New(fmt.Sprintf("Artifacts JSON 数据解析报错:", err.Error()))
 	}
 
-	artifactsData := new([]model.Artifacts)
+	// 创建 artifactsData 切片并复制数据
+	artifactsData := make([]model.Artifacts, len(*artifacts))
 
-	artifactsData.Name
-	for _, tag := range artifacts.Tags {
-		artifactsData = append(artifactsData, Tag{Name: tag.Name})
+	// 转换数据格式为 artifactsData 数据格式，并返回 controller 层
+	for i, tag := range *artifacts {
+		//logger.Info(tag.Tags[0].Name)
+		artifactsData[i] = model.Artifacts{Name: tag.Tags[0].Name}
 	}
-
-	artifactsData = artifacts
-	fmt.Println(artifacts)
-	return nil, nil
+	return &artifactsData, nil
 }

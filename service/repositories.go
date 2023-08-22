@@ -15,7 +15,7 @@ func Repositories(repositoriesUrl string) (r *[]model.Repositories, err error) {
 	if err != nil {
 		return nil, err
 	}
-	fmt.Println(string(data))
+	//logger.Info(string(data))
 
 	// 解析 JSON 数据
 	repositories := new([]model.Repositories)
