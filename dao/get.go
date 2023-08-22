@@ -1,4 +1,4 @@
-package service
+package dao
 
 import (
 	"encoding/base64"
@@ -11,7 +11,6 @@ import (
 	"net/url"
 )
 
-// Get
 func Get(tmpUrl string) (body []byte, err error) {
 	//定义url路径及参数
 	apiUrl := config.HarborURL + tmpUrl

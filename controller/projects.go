@@ -21,8 +21,11 @@ func Projects(c *gin.Context) {
 		})
 		return
 	}
+
+	total := len(*projectsData)
 	c.JSON(http.StatusOK, gin.H{
-		"msg":  "获取 Projects 列表成功",
-		"data": projectsData,
+		"msg":   "获取 Projects 列表成功",
+		"data":  projectsData,
+		"total": total,
 	})
 }

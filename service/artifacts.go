@@ -5,12 +5,13 @@ import (
 	"errors"
 	"fmt"
 	"github.com/wonderivan/logger"
+	"harbor-image-delete/dao"
 	"harbor-image-delete/model"
 )
 
-func Artifacts(repositoriesUrl string) (a *[]model.Artifacts, err error) {
+func Artifacts(artifactsUrl string) (a *[]model.Artifacts, err error) {
 	// 发起 HTTP 请求
-	data, err := Get(repositoriesUrl)
+	data, err := dao.Get(artifactsUrl)
 
 	if err != nil {
 		return nil, err

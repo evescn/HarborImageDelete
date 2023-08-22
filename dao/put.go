@@ -1,4 +1,4 @@
-package service
+package dao
 
 import (
 	"encoding/base64"
@@ -13,11 +13,11 @@ import (
 	"net/url"
 )
 
-// Get
+// Put
 // 发起一个 Get 请求
-func Delete(api_url string) (p *[]model.Projects, err error) {
+func Put(tmpUrl string) (p *[]model.Projects, err error) {
 	//定义url路径及参数
-	apiUrl := config.HarborURL + api_url
+	apiUrl := config.HarborURL + tmpUrl
 
 	//设置请求参数
 	data := url.Values{}

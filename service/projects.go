@@ -5,12 +5,13 @@ import (
 	"errors"
 	"fmt"
 	"github.com/wonderivan/logger"
+	"harbor-image-delete/dao"
 	"harbor-image-delete/model"
 )
 
 func Projects(projectsUrl string) (p *[]model.Projects, err error) {
 	// 发起 HTTP 请求
-	data, err := Get(projectsUrl)
+	data, err := dao.Get(projectsUrl)
 
 	if err != nil {
 		return nil, err

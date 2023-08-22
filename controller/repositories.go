@@ -23,7 +23,7 @@ func Repositories(c *gin.Context) {
 
 	// 解析 JSON 数据
 	repositoriesData := new([]model.Repositories)
-	
+
 	repositoriesData, err := service.Repositories(repositoriesUrl)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
@@ -33,9 +33,11 @@ func Repositories(c *gin.Context) {
 		return
 	}
 
+	total := len(*repositoriesData)
 	c.JSON(http.StatusOK, gin.H{
-		"msg":  "获取 Repositories 列表成功",
-		"data": repositoriesData,
+		"msg":   "获取 Repositories 列表成功",
+		"data":  repositoriesData,
+		"total": total,
 	})
 
 }

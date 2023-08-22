@@ -32,9 +32,11 @@ func Artifacts(c *gin.Context) {
 		return
 	}
 
+	total := len(*artifactsData)
 	c.JSON(http.StatusOK, gin.H{
-		"msg":  "获取 Artifacts 列表成功",
-		"data": artifactsData,
+		"msg":   "获取 Artifacts 列表成功",
+		"data":  artifactsData,
+		"total": total,
 	})
 
 }
