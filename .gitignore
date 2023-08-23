@@ -23,4 +23,4 @@
 # go.mod
 # go.sum
 # vendor/
-config
+config/
