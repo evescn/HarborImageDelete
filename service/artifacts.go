@@ -9,8 +9,9 @@ import (
 	"harbor-image-delete/model"
 )
 
-func Artifacts(artifactsUrl string) (a *[]model.Artifacts, err error) {
+func Artifacts(params *model.ArtifactsUrl) (a *[]model.Artifacts, err error) {
 	// 发起 HTTP 请求
+	artifactsUrl := fmt.Sprintf("/api/v2.0/projects/%s/repositories/%s/artifacts?page_size=100", params.ProjectName, params.RepositoriesName)
 	data, err := dao.Get(artifactsUrl)
 
 	if err != nil {
@@ -20,7 +21,7 @@ func Artifacts(artifactsUrl string) (a *[]model.Artifacts, err error) {
 
 	// 解析 JSON 数据
 	artifacts := new([]model.ArtifactsTmp)
-	if err := json.Unmarshal(data, &artifacts); err != nil {
+	if err = json.Unmarshal(data, &artifacts); err != nil {
 		logger.Error("Artifacts JSON 数据解析报错:", err.Error())
 		return nil, errors.New(fmt.Sprintf("Artifacts JSON 数据解析报错:", err.Error()))
 	}

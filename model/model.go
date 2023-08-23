@@ -1,8 +1,18 @@
 package model
 
+import "sync"
+
+var Wg sync.WaitGroup
+var WgProjects sync.WaitGroup
+
 type Projects struct {
 	Name      string `json:"name" form:"name" binding:"required"`
 	ProjectId int    `json:"project_id"`
+}
+
+type ProjectsUrl struct {
+	ProjectName string `json:"project_name" form:"project_name" binding:"required"`
+	Total       int    `json:"total" form:"total"`
 }
 
 type Repositories struct {
@@ -14,6 +24,7 @@ type Repositories struct {
 type ArtifactsUrl struct {
 	ProjectName      string `json:"project_name" form:"project_name" binding:"required"`
 	RepositoriesName string `json:"repositories_name" form:"repositories_name" binding:"required"`
+	Total            int    `json:"total" form:"total"`
 }
 
 type ArtifactsTmp struct {

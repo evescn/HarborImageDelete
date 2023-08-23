@@ -10,8 +10,9 @@ import (
 	"strings"
 )
 
-func Repositories(repositoriesUrl string) (r *[]model.Repositories, err error) {
+func Repositories(params *model.Projects) (r *[]model.Repositories, err error) {
 	// 发起 HTTP 请求
+	repositoriesUrl := fmt.Sprintf("/api/v2.0/projects/%s/repositories?page_size=100", params.Name)
 	data, err := dao.Get(repositoriesUrl)
 
 	if err != nil {

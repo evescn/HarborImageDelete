@@ -13,7 +13,12 @@ func SetupApiRouters(r *gin.Engine) {
 			"data": nil,
 		})
 	})
+	// GET
 	r.GET("/Projects", controller.Projects)
 	r.GET("/Repositories", controller.Repositories)
 	r.GET("/Artifacts", controller.Artifacts)
+
+	// DELETE
+	r.DELETE("/DeleteFromProjectsAndRepositories", controller.DeleteFromProjectsAndRepositories)
+	r.DELETE("/DeleteFromProjects", controller.DeleteFromProjects)
 }

@@ -2,46 +2,48 @@ package dao
 
 import (
 	"encoding/base64"
-	"encoding/json"
 	"errors"
 	"fmt"
 	"github.com/wonderivan/logger"
 	"harbor-image-delete/config"
 	"harbor-image-delete/model"
-	"io/ioutil"
+	"io"
 	"net/http"
-	"net/url"
 )
 
-// Get
-// 发起一个 Get 请求
-func Delete(api_url string) (p *[]model.Projects, err error) {
-	//定义url路径及参数
-	apiUrl := config.HarborURL + api_url
+func Delete(tmpUrl string) (body []byte, err error) {
 
-	//设置请求参数
-	data := url.Values{}
-	data.Set("Content-Type", "application/json")
+	// 定义url路径及参数
+	apiUrl := config.HarborURL + tmpUrl
+	method := "DELETE"
+
+	client := &http.Client{}
+	req, err := http.NewRequest(method, apiUrl, nil)
+
+	if err != nil {
+		logger.Error("New HTTP 报错: ", err.Error())
+		return nil, errors.New(fmt.Sprintf("New HTTP 请求报错: ", err.Error()))
+	}
 
 	// 添加 Basic Authentication 头
 	auth := config.UserPassword
 	authHeader := "Basic " + base64.StdEncoding.EncodeToString([]byte(auth))
-	data.Set("Authorization", authHeader)
+	req.Header.Add("Content-Type", "application/json")
+	req.Header.Add("Authorization", authHeader)
 
-	//拼接完整url
-	u, _ := url.ParseRequestURI(apiUrl)
-	u.RawQuery = data.Encode()
-	fmt.Println("请求完整路径为", u.String())
-
-	//发起请求
-	resp, _ := http.Get(u.String())
-	body, _ := ioutil.ReadAll(resp.Body)
-
-	// 解析 JSON 数据
-	projects := new([]model.Projects)
-	if err := json.Unmarshal(body, &projects); err != nil {
-		logger.Error("Projects JSON 数据解析报错:", err)
-		return nil, errors.New(fmt.Sprintf("Projects JSON 数据解析报错:", err))
+	// 发起请求
+	res, err := client.Do(req)
+	if err != nil {
+		logger.Error("HTTP 请求报错: ", err.Error())
+		return nil, errors.New(fmt.Sprintf("HTTP 请求报错: ", err.Error()))
 	}
-	return projects, nil
+	defer res.Body.Close()
+	defer model.Wg.Done()
+
+	body, err = io.ReadAll(res.Body)
+	if err != nil {
+		logger.Error("IO 数据解析报错: ", err.Error())
+		return nil, errors.New(fmt.Sprintf("IO 数据解析报错: ", err.Error()))
+	}
+	return body, nil
 }

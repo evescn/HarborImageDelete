@@ -1,7 +1,6 @@
 package controller
 
 import (
-	"fmt"
 	"github.com/gin-gonic/gin"
 	"harbor-image-delete/model"
 	"harbor-image-delete/service"
@@ -9,9 +8,8 @@ import (
 )
 
 func Repositories(c *gin.Context) {
-
 	params := new(model.Projects)
-	//自动把context中request的请求体参数绑定到params上
+	// 绑定参数
 	if err := c.ShouldBind(params); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"err": err.Error(),
@@ -19,12 +17,8 @@ func Repositories(c *gin.Context) {
 		return
 	}
 
-	repositoriesUrl := fmt.Sprintf("/api/v2.0/projects/%s/repositories?page_size=100", params.Name)
-
-	// 解析 JSON 数据
-	repositoriesData := new([]model.Repositories)
-
-	repositoriesData, err := service.Repositories(repositoriesUrl)
+	// 调用 service 方法，获取 Repositories 列表
+	repositoriesData, err := service.Repositories(params)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"msg":  err.Error(),
@@ -33,6 +27,7 @@ func Repositories(c *gin.Context) {
 		return
 	}
 
+	// 统计 Repositories 列表总数
 	total := len(*repositoriesData)
 	c.JSON(http.StatusOK, gin.H{
 		"msg":   "获取 Repositories 列表成功",
