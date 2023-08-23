@@ -50,6 +50,8 @@ func DeleteFromProjectsAndRepositories(c *gin.Context) {
 		"total": total,
 	})
 
+	defer service.SystemGcSchedule()
+
 }
 
 // DeleteFromProjects 基于 Projects 删除对应 Projects 所有 Repositories 多余镜像，默认保留最后 20 次
@@ -97,6 +99,8 @@ func DeleteFromProjects(c *gin.Context) {
 		"data":  deleteData,
 		"total": total,
 	})
+
+	defer service.SystemGcSchedule()
 }
 
 // DeleteALL 删除所有 Projects 下 Repositories 多余镜像，默认保留最后 20 次
