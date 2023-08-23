@@ -45,5 +45,6 @@ func Delete(tmpUrl string) (body []byte, err error) {
 		logger.Error("IO 数据解析报错: ", err.Error())
 		return nil, errors.New(fmt.Sprintf("IO 数据解析报错: ", err.Error()))
 	}
+
 	return body, nil
 }

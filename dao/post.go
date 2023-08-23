@@ -8,15 +8,26 @@ import (
 	"harbor-image-delete/config"
 	"io"
 	"net/http"
+	"strings"
 )
 
-func Get(tmpUrl string) (body []byte, err error) {
+func Post(tmpUrl string) (body []byte, err error) {
 	// 定义url路径及参数
 	apiUrl := config.HarborURL + tmpUrl
-	method := "GET"
-	logger.Info(apiUrl)
+	method := "POST"
+
+	payload := strings.NewReader(`{
+            "parameters": {
+                "delete_untagged": false,
+                "dry_run": false
+            },
+            "schedule": {
+                "type": "Manual"
+            }
+        }`)
+
 	client := &http.Client{}
-	req, err := http.NewRequest(method, apiUrl, nil)
+	req, err := http.NewRequest(method, apiUrl, payload)
 
 	if err != nil {
 		logger.Error("New HTTP 报错: ", err.Error())

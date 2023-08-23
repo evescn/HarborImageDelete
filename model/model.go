@@ -3,7 +3,6 @@ package model
 import "sync"
 
 var Wg sync.WaitGroup
-var WgProjects sync.WaitGroup
 
 type Projects struct {
 	Name      string `json:"name" form:"name" binding:"required"`
@@ -33,4 +32,8 @@ type ArtifactsTmp struct {
 
 type Artifacts struct {
 	Name string `json:"name"`
+}
+
+type SystemGcSchedule struct {
+	JobStatus string `json:"job_status"`
 }

@@ -1,6 +1,7 @@
 package service
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 	"github.com/gin-gonic/gin"
@@ -8,6 +9,7 @@ import (
 	"harbor-image-delete/dao"
 	"harbor-image-delete/model"
 	"strings"
+	"time"
 )
 
 // DeleteFromProjectsAndRepositories 基于 Projects 和 Repositories 删除对应 Repositories 下多余镜像，默认保留最后 20 次
@@ -65,38 +67,33 @@ func DeleteFromProjects(params *model.ProjectsUrl, repositoriesData *[]model.Rep
 	errorsCh := make(chan error)
 	deleteDataAll := make([]model.ArtifactsUrl, len(tmpData))
 	for i, repositoriesName := range tmpData {
-		model.WgProjects.Add(1)
-		go func() {
-			new_params := &model.ArtifactsUrl{
-				ProjectName:      params.ProjectName,
-				RepositoriesName: repositoriesName.Name,
-				Total:            params.Total,
-			}
+		new_params := &model.ArtifactsUrl{
+			ProjectName:      params.ProjectName,
+			RepositoriesName: repositoriesName.Name,
+			Total:            params.Total,
+		}
 
-			// 调用 service 方法，获取 Artifacts 列表
-			artifactsData, err := Artifacts(new_params)
-			if err != nil {
-				errorsCh <- err
-			}
-			logger.Info(artifactsData)
+		// 调用 service 方法，获取 Artifacts 列表
+		artifactsData, err := Artifacts(new_params)
+		if err != nil {
+			errorsCh <- err
+		}
+		logger.Info(artifactsData)
 
-			// 调用 service 方法，删除 Image 数据
-			deleteData, err := DeleteFromProjectsAndRepositories(new_params, artifactsData)
-			if err != nil {
-				errorsCh <- err
-			}
+		// 调用 service 方法，删除 Image 数据
+		deleteData, err := DeleteFromProjectsAndRepositories(new_params, artifactsData)
+		if err != nil {
+			errorsCh <- err
+		}
 
-			// 统计需要删除 Image 总数
-			total := len(deleteData)
-			deleteDataAll[i] = model.ArtifactsUrl{
-				ProjectName:      params.ProjectName,
-				RepositoriesName: repositoriesName.Name,
-				Total:            total,
-			}
-			model.WgProjects.Done()
-		}()
+		// 统计需要删除 Image 总数
+		total := len(deleteData)
+		deleteDataAll[i] = model.ArtifactsUrl{
+			ProjectName:      params.ProjectName,
+			RepositoriesName: repositoriesName.Name,
+			Total:            total,
+		}
 	}
-	model.WgProjects.Wait()
 	close(errorsCh)
 
 	var allErrors []string
@@ -116,4 +113,31 @@ func DeleteFromProjects(params *model.ProjectsUrl, repositoriesData *[]model.Rep
 // DeleteALL 删除所有 Projects 下 Repositories 多余镜像，默认保留最后 20 次
 func DeleteALL(c *gin.Context) {
 	return
+}
+
+// SystemGcSchedule 创建任务清理磁盘镜像
+func SystemGcSchedule() (data string, err error) {
+	// 创建 GC 任务
+	systemGcScheduleUrl := "/api/v2.0/system/gc/schedule"
+	dao.Post(systemGcScheduleUrl)
+
+	// 确定服务运行正常
+	time.Sleep(10 * time.Second)
+	systemGcScheduleUrl = "/api/v2.0/system/gc?page=1&page_size=1"
+	body, err := dao.Get(systemGcScheduleUrl)
+	if err != nil {
+		return "", err
+	}
+	//logger.Info(string(body))
+
+	systemGcSchedule := new([]model.SystemGcSchedule)
+	if err = json.Unmarshal(body, &systemGcSchedule); err != nil {
+		logger.Error("SystemGcSchedule JSON 数据解析报错:", err.Error())
+		return "", errors.New(fmt.Sprintf("Artifacts JSON 数据解析报错:", err.Error()))
+	}
+
+	for _, jobStatus := range *systemGcSchedule {
+		return jobStatus.JobStatus, nil
+	}
+	return "", nil
 }

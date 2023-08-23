@@ -21,4 +21,6 @@ func SetupApiRouters(r *gin.Engine) {
 	// DELETE
 	r.DELETE("/DeleteFromProjectsAndRepositories", controller.DeleteFromProjectsAndRepositories)
 	r.DELETE("/DeleteFromProjects", controller.DeleteFromProjects)
+	// POST
+	r.POST("/SystemGcSchedule", controller.SystemGcSchedule)
 }
